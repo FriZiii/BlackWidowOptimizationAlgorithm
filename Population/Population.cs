@@ -1,4 +1,6 @@
-﻿namespace BlackWidowOptimizationAlgorithm
+﻿using BlackWidowOptimizationAlgorithm.FitnessFunctions;
+
+namespace BlackWidowOptimizationAlgorithm
 {
     public class Population
     {
@@ -13,7 +15,7 @@
         /// </summary>
         /// <param name="populationSize"></param>
         /// <param name="numberOfGenes"></param>
-        public Population(int populationSize, int numberOfGenes, Func<Chromosome, double> fitnessFunction)
+        public Population(int populationSize, int numberOfGenes, IFitnessFunction fitnessFunction)
         {
             Chromosomes = new List<Chromosome>();
             for (int i = 0; i < populationSize; i++)

@@ -13,7 +13,6 @@ namespace BlackWidowOptimizationAlgorithm.OptimalizationAlgorithms.BlackWidow
 
         private readonly int populationSize;
         private readonly int numberOfGenes;
-
         private readonly Random randomizer;
 
         private readonly Population population_1;
@@ -34,7 +33,6 @@ namespace BlackWidowOptimizationAlgorithm.OptimalizationAlgorithms.BlackWidow
             this.fitnessFunction = fitnessFunction;
             this.populationSize = populationSize;
             this.numberOfGenes = numberOfGenes;
-
             randomizer = new Random();
 
             population_1 = new Population();
@@ -45,36 +43,47 @@ namespace BlackWidowOptimizationAlgorithm.OptimalizationAlgorithms.BlackWidow
         public double Solve()
         {
             int currentIteration = 0;
-            var initialPopulation = new Population(populationSize, numberOfGenes, fitnessFunction.Function);
+            var initialPopulation = new Population(populationSize, numberOfGenes, fitnessFunction);
 
-            var numberOfReproduction = procreatingRate * populationSize;
-            var bestChromosomes = initialPopulation.Chromosomes.OrderBy(chromosome => chromosome.FitnessValue).Take((int)Math.Floor(numberOfReproduction)).ToList();
+            var bestWidow = initialPopulation.Chromosomes.MinBy(x => x.FitnessValue);
+
             while (currentIteration < maxIterations)
             {
-                foreach (var chromosome in bestChromosomes)
-                {
-                    population_1.Chromosomes.Add(chromosome);
-                }
+                population_1.Chromosomes.Clear();
+                population_2.Chromosomes.Clear();
+                population_3.Chromosomes.Clear();
+                var numberOfReproduction = procreatingRate * initialPopulation.Chromosomes.Count;
 
+                var bestChromosomes = initialPopulation.Chromosomes.OrderBy(chromosome => chromosome.FitnessValue).Take((int)Math.Floor(numberOfReproduction)).ToList();
+                population_1.Chromosomes.AddRange(bestChromosomes);
+
+                //Proceate
+                var childerns = new List<Chromosome>();
                 for (int i = 0; i < Math.Floor(numberOfReproduction) - 1; i++)
                 {
                     SelectParents(out Chromosome women, out Chromosome men);
-                    Procreate(women, men);
+                    childerns.AddRange(Procreate(women, men));
                 }
+
+                    //Kiling childrens
+                    var numberOfCannibalism = childerns.Count - Math.Floor(cannibalismRate * childerns.Count);
+                    List<Chromosome> bestChirdlen = childerns.OrderBy(children => children.FitnessValue).Take((int)Math.Floor(numberOfCannibalism)).ToList();
+                    population_2.Chromosomes.AddRange(bestChirdlen);
+                    population_2.Chromosomes.AddRange(population_1.Chromosomes);
 
                 Mutate();
 
                 UpdatePopulation(ref initialPopulation);
 
-                bestChromosomes.AddRange(initialPopulation.Chromosomes.OrderBy(chromosome => chromosome.FitnessValue).Take((int)Math.Floor(numberOfReproduction)));
+                bestChromosomes = initialPopulation.Chromosomes.OrderBy(chromosome => chromosome.FitnessValue).ToList();
 
+                var bestChromosome = bestChromosomes.First();
+
+                XBest = bestChromosome.Genes;
+                NumberOfEvaluationFitnessFunction = fitnessFunction.NumberOfEvaluationFitnessFunction;
+                FBest = bestChromosome.FitnessValue;
                 currentIteration++;
             }
-
-            bestChromosomes = bestChromosomes.OrderBy(e => e.FitnessValue).ToList();
-            XBest = bestChromosomes[0].Genes;
-            FBest = bestChromosomes[0].FitnessValue;
-            NumberOfEvaluationFitnessFunction = fitnessFunction.NumberOfEvaluationFitnessFunction;
             return FBest;
         }
 
@@ -98,67 +107,65 @@ namespace BlackWidowOptimizationAlgorithm.OptimalizationAlgorithms.BlackWidow
                 men = population_1.Chromosomes[randomIndex1];
             }
         }
-        private void Procreate(Chromosome women, Chromosome men)
+        private IEnumerable<Chromosome> Procreate(Chromosome women, Chromosome men)
         {
             List<Chromosome> childrens = new();
             double[] alpha = new double[numberOfGenes];
-            for (int j = 0; j < numberOfGenes; j++)
+
+            for (int k = 0; k < alpha.Length; k++)
             {
-                for (int k = 0; k < alpha.Length; k++)
-                {
-                    alpha[k] = randomizer.NextDouble();
-                }
-
-                var firstChild = new Chromosome(numberOfGenes, fitnessFunction.Function);
-                for (int k = 0; k < numberOfGenes; k++)
-                {
-                    firstChild.Genes[k] = alpha[k] * women.Genes[k] + (1 - alpha[k]) * men.Genes[k];
-                }
-
-                var secondChild = new Chromosome(numberOfGenes, fitnessFunction.Function);
-                for (int k = 0; k < numberOfGenes; k++)
-                {
-                    secondChild.Genes[k] = alpha[k] * men.Genes[k] + (1 - alpha[k]) * women.Genes[k];
-                }
-                firstChild.CalculeteFitnessValue();
-                secondChild.CalculeteFitnessValue();
-                childrens.Add(firstChild);
-                childrens.Add(secondChild);
+                alpha[k] = randomizer.NextDouble();
             }
+
+            var firstChild = new Chromosome(numberOfGenes, fitnessFunction);
+            for (int k = 0; k < numberOfGenes; k++)
+            {
+                firstChild.Genes[k] = alpha[k] * women.Genes[k] + (1 - alpha[k]) * men.Genes[k];
+            }
+
+            var secondChild = new Chromosome(numberOfGenes, fitnessFunction);
+            for (int k = 0; k < numberOfGenes; k++)
+            {
+                secondChild.Genes[k] = alpha[k] * men.Genes[k] + (1 - alpha[k]) * women.Genes[k];
+            }
+
+            firstChild.CalculeteFitnessValue();
+            secondChild.CalculeteFitnessValue();
+            childrens.Add(firstChild);
+            childrens.Add(secondChild);
 
             population_1.Chromosomes.Remove(men);
 
-            //Kiling childrens
-            var numberOfCannibalism = childrens.Count - Math.Floor(cannibalismRate * childrens.Count);
-
-            List<Chromosome> bestChirdlen = childrens.OrderBy(children => children.FitnessValue).Take((int)Math.Floor(numberOfCannibalism)).ToList();
-            population_2.Chromosomes.AddRange(bestChirdlen);
+            return childrens;
         }
         private void Mutate()
         {
-            var numberOfMutation = Math.Floor(mutationRate * population_1.Chromosomes.Count);
-            var randomizedPopulation_1 = population_1.Chromosomes.OrderBy(e => randomizer.Next(0, population_1.Chromosomes.Count)).ToList();
+            var numberOfMutation = Math.Floor(mutationRate * population_2.Chromosomes.Count);
+            var randomizedPopulation_2 = population_2.Chromosomes.OrderBy(e => randomizer.Next(0, population_2.Chromosomes.Count)).ToList();
             for (int j = 0; j < numberOfMutation; j++)
             {
+                var currentChromosome = randomizedPopulation_2[j];
                 int randomIndex1, randomIndex2;
                 do
                 {
-                    randomIndex1 = randomizer.Next(0, randomizedPopulation_1[j].Genes.Length - 1);
-                    randomIndex2 = randomizer.Next(0, randomizedPopulation_1[j].Genes.Length - 1);
+                    randomIndex1 = randomizer.Next(0, currentChromosome.Genes.Length);
+                    randomIndex2 = randomizer.Next(0, currentChromosome.Genes.Length);
                 } while (randomIndex1 == randomIndex2);
 
-                var temp = randomizedPopulation_1[j].Genes;
-                randomizedPopulation_1[j].Genes[randomIndex1] = randomizedPopulation_1[j].Genes[randomIndex2];
-                randomizedPopulation_1[j].Genes[randomIndex2] = temp[randomIndex1];
+                var temp = currentChromosome.Genes;
+                currentChromosome.Genes[randomIndex1] = currentChromosome.Genes[randomIndex2];
+                currentChromosome.Genes[randomIndex2] = temp[randomIndex1];
 
-                randomizedPopulation_1[j].CalculeteFitnessValue();
-                population_3.Chromosomes.Add(randomizedPopulation_1[j]);
+                currentChromosome.CalculeteFitnessValue();
+                population_3.Chromosomes.Add(currentChromosome);
             }
         }
+
         private void UpdatePopulation(ref Population initialPopulation)
         {
             population_3.Chromosomes.AddRange(population_2.Chromosomes);
-            initialPopulation = population_3;
+            initialPopulation.Chromosomes.Clear();
+            initialPopulation.Chromosomes.AddRange(population_3.Chromosomes);
         }
     }
 }

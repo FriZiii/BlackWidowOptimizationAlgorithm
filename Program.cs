@@ -4,7 +4,7 @@ using BlackWidowOptimizationAlgorithm.OptimalizationAlgorithms.BlackWidow;
 
 var parameters = new BlackWidowAlgorithmParameters()
 {
-    MaxIterations = 15,
+    MaxIterations = 5500,
     ProcreatingRate = 0.6,
     MutationRate = 0.4,
     CanibalismRate = 0.44,
@@ -13,9 +13,12 @@ var parameters = new BlackWidowAlgorithmParameters()
 var populationSize = 300;
 var numberOfGenes = 2;
 
-IFitnessFunction fitnessFunction = new BealeFunction();
+var domain = new FunctionDomain(-5, 5);
+
+IFitnessFunction fitnessFunction = new HimmelblausFunction(domain);
 
 var BWOA = new BlackWidowAlgorithm(parameters, fitnessFunction, populationSize, numberOfGenes);
+
 var result = BWOA.Solve();
 
 Console.WriteLine($"End with result {result}");

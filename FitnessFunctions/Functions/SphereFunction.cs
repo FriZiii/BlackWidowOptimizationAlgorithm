@@ -2,7 +2,14 @@
 {
     public class SphereFunction : IFitnessFunction
     {
-        public int NumberOfEvaluationFitnessFunction { get; set ; }
+        public int NumberOfEvaluationFitnessFunction { get; set; }
+
+        public FunctionDomain Domain { get; set; }
+
+        public SphereFunction(FunctionDomain domain)
+        {
+            Domain = domain;
+        }
 
         public double Function(Chromosome chromosome)
         {

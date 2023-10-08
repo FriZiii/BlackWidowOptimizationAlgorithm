@@ -1,4 +1,6 @@
-﻿namespace BlackWidowOptimizationAlgorithm
+﻿using BlackWidowOptimizationAlgorithm.FitnessFunctions;
+
+namespace BlackWidowOptimizationAlgorithm
 {
     public class Chromosome
     {
@@ -12,15 +14,15 @@
         }
         public Func<Chromosome, double> FitnessFunction { get; }
 
-        public Chromosome(int nubmerOfGenes, Func<Chromosome, double> fitnessFunction)
+        public Chromosome(int nubmerOfGenes, IFitnessFunction fitnessFunction)
         {
             var randomizer = new Random();
-            FitnessFunction = fitnessFunction;
+            FitnessFunction = fitnessFunction.Function;
 
             Genes = new double[nubmerOfGenes];
             for (int i = 0; i < nubmerOfGenes; i++)
             {
-                Genes[i] = randomizer.NextDouble();
+                Genes[i] = (randomizer.NextDouble() * (fitnessFunction.Domain.UpperBound - fitnessFunction.Domain.LowerBound) + fitnessFunction.Domain.LowerBound);
             }
             CalculeteFitnessValue();
         }
