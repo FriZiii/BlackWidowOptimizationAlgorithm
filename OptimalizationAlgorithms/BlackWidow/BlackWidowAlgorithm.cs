@@ -140,9 +140,9 @@ namespace BlackWidowOptimizationAlgorithm.OptimalizationAlgorithms.BlackWidow
         }
         private void Mutate()
         {
-            var numberOfMutation = Math.Floor(mutationRate * population_2.Chromosomes.Count);
+            var numberOfMutation = (int)Math.Floor(mutationRate * population_2.Chromosomes.Count);
             var randomizedPopulation_2 = population_2.Chromosomes.OrderBy(e => randomizer.Next(0, population_2.Chromosomes.Count)).ToList();
-            for (int j = 0; j < numberOfMutation; j++)
+            Parallel.For(0, numberOfMutation, j =>
             {
                 var currentChromosome = randomizedPopulation_2[j];
                 int randomIndex1, randomIndex2;
@@ -158,7 +158,7 @@ namespace BlackWidowOptimizationAlgorithm.OptimalizationAlgorithms.BlackWidow
 
                 currentChromosome.CalculeteFitnessValue();
                 population_3.Chromosomes.Add(currentChromosome);
-            }
+            });
         }
 
         private void UpdatePopulation(ref Population initialPopulation)

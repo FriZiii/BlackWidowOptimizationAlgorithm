@@ -1,4 +1,5 @@
 ﻿using BlackWidowOptimizationAlgorithm.FitnessFunctions;
+using BlackWidowOptimizationAlgorithm.FitnessFunctions.Functions;
 
 namespace BlackWidowOptimizationAlgorithm
 {
@@ -17,14 +18,28 @@ namespace BlackWidowOptimizationAlgorithm
         public Chromosome(int nubmerOfGenes, IFitnessFunction fitnessFunction)
         {
             var randomizer = new Random();
-            FitnessFunction = fitnessFunction.Function;
-
-            Genes = new double[nubmerOfGenes];
-            for (int i = 0; i < nubmerOfGenes; i++)
+            if(fitnessFunction is BukinFunction)
             {
-                Genes[i] = (randomizer.NextDouble() * (fitnessFunction.Domain.UpperBound - fitnessFunction.Domain.LowerBound) + fitnessFunction.Domain.LowerBound);
+                FitnessFunction = fitnessFunction.Function;
+
+                var bukinFuntion = fitnessFunction as BukinFunction;
+
+                Genes = new double[nubmerOfGenes];
+                Genes[0] = (randomizer.NextDouble() * (bukinFuntion!.Domain.UpperBound - bukinFuntion.Domain!.LowerBound) + bukinFuntion.Domain!.LowerBound);
+                Genes[1] = (randomizer.NextDouble() * (bukinFuntion!.DomainY.UpperBound - bukinFuntion.DomainY!.LowerBound) + bukinFuntion.DomainY!.LowerBound);
+                CalculeteFitnessValue();
             }
-            CalculeteFitnessValue();
+            else
+            {
+                FitnessFunction = fitnessFunction.Function;
+
+                Genes = new double[nubmerOfGenes];
+                for (int i = 0; i < nubmerOfGenes; i++)
+                {
+                    Genes[i] = (randomizer.NextDouble() * (fitnessFunction.Domain.UpperBound - fitnessFunction.Domain.LowerBound) + fitnessFunction.Domain.LowerBound);
+                }
+                CalculeteFitnessValue();
+            }
         }
 
         public void CalculeteFitnessValue()
