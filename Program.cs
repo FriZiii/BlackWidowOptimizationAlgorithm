@@ -1,31 +1,35 @@
-﻿using BlackWidowOptimizationAlgorithm.FitnessFunctions;
-using BlackWidowOptimizationAlgorithm.FitnessFunctions.Functions;
-using BlackWidowOptimizationAlgorithm.OptimalizationAlgorithms.BlackWidow;
+﻿using BlackWidowOptimizationAlgorithm.OptimalizationAlgorithms.BlackWidow;
+using tests;
+using System.Collections.Generic;
 
-var parameters = new BlackWidowAlgorithmParameters()
+List<TestCase> generateTestCases(List<int> populationSizes, List<int> maxIterations)
 {
-    MaxIterations = 1_000,
-    ProcreatingRate = 0.6,
-    MutationRate = 0.4,
-    CanibalismRate = 0.44,
-};
-
-var populationSize = 300;
-var numberOfGenes = 2;
-
-var domain = new FunctionDomain(-15, -5);
-var domainY = new FunctionDomain(-3, 3);
-
-IFitnessFunction fitnessFunction = new BukinFunction(domain, domainY);
-
-var BWOA = new BlackWidowAlgorithm(parameters, fitnessFunction, populationSize, numberOfGenes);
-
-var result = BWOA.Solve();
-
-Console.WriteLine($"End with result {result}");
-Console.WriteLine($"Parameters:");
-foreach (var parametr in BWOA.XBest)
-{
-    Console.WriteLine(parametr);
+    var result = new List<TestCase>();
+    foreach (var populationSize in populationSizes)
+    {
+        foreach (var maxIteration in maxIterations)
+        {
+            var testCase = new TestCase
+            {
+                populationSize = populationSize,
+                blackWidowAlgorithmParameters = new BlackWidowAlgorithmParameters
+                {
+                    MaxIterations = maxIteration,
+                    ProcreatingRate = 0.6,
+                    MutationRate = 0.5,
+                    CanibalismRate = 0.44
+                }
+            };
+            result.Add(testCase);
+        }
+    }
+    return result;
 }
-Console.WriteLine($"Number of evaluations {BWOA.NumberOfEvaluationFitnessFunction}");
+
+var populationSizes = new List<int> { 10, 20, 40, 80 };
+var maxIterations = new List<int> { 5, 10, 20, 40, 60, 80 };
+
+var testCases = generateTestCases(populationSizes, maxIterations);
+
+var testFunction = new HimmelblauFunctionTest(testCases);
+testFunction.TestsToCsv();

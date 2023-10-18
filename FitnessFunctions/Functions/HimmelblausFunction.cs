@@ -17,8 +17,8 @@
                 throw new Exception("HimmelblausFunction works only for 2 parameters function");
             NumberOfEvaluationFitnessFunction++;
 
-            return Math.Pow(chromosome.Genes[0] * chromosome.Genes[0] + chromosome.Genes[1] - 11, 2.0) +
-                Math.Pow(chromosome.Genes[0] + chromosome.Genes[1] * chromosome.Genes[1] - 7, 2.0);
+            return Math.Pow(chromosome.Genes[0] * chromosome.Genes[0] + chromosome.Genes[1] - 11d, 2.0) +
+                Math.Pow(chromosome.Genes[0] + chromosome.Genes[1] * chromosome.Genes[1] - 7d, 2.0);
         }
     }
 }

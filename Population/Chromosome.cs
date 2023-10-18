@@ -27,7 +27,6 @@ namespace BlackWidowOptimizationAlgorithm
                 Genes = new double[nubmerOfGenes];
                 Genes[0] = (randomizer.NextDouble() * (bukinFuntion!.Domain.UpperBound - bukinFuntion.Domain!.LowerBound) + bukinFuntion.Domain!.LowerBound);
                 Genes[1] = (randomizer.NextDouble() * (bukinFuntion!.DomainY.UpperBound - bukinFuntion.DomainY!.LowerBound) + bukinFuntion.DomainY!.LowerBound);
-                CalculeteFitnessValue();
             }
             else
             {
@@ -38,8 +37,9 @@ namespace BlackWidowOptimizationAlgorithm
                 {
                     Genes[i] = (randomizer.NextDouble() * (fitnessFunction.Domain.UpperBound - fitnessFunction.Domain.LowerBound) + fitnessFunction.Domain.LowerBound);
                 }
-                CalculeteFitnessValue();
+                
             }
+            CalculeteFitnessValue();
         }
 
         public void CalculeteFitnessValue()
