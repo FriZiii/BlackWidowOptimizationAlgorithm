@@ -32,4 +32,9 @@ var maxIterations = new List<int> { 5, 10, 20, 40, 60, 80 };
 var testCases = generateTestCases(populationSizes, maxIterations);
 
 var testFunction = new HimmelblauFunctionTest(testCases);
-testFunction.TestsToCsv();
+
+using (StreamWriter writer = new StreamWriter("/result.csv"))
+{
+    var result = testFunction.TestsToCsv();
+    writer.WriteLine(result);
+}

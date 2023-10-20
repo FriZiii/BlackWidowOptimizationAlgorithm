@@ -1,5 +1,4 @@
 using BlackWidowOptimizationAlgorithm.FitnessFunctions;
-using BlackWidowOptimizationAlgorithm.FitnessFunctions.Functions;
 using BlackWidowOptimizationAlgorithm.OptimalizationAlgorithms.BlackWidow;
 using utils;
 namespace tests
@@ -35,9 +34,10 @@ namespace tests
             return true;
         }
 
-        public bool TestsToCsv()
+        public string TestsToCsv()
         {
             Console.WriteLine($"Funkcja testowa; Liczba szukanych parametrów; Współczynnik prokreacji; Współczynnik mutacji; Współczynnik kanibalizmu; Maksymalna liczba iteracji; Rozmiar populacji; Znalezione najlepsze minimum; Odchylenie standardowe poszukiwanych parametrów; Najlepsza znaleziona wartość funkcji celu; Odchylenie standardowe funkcji celu");
+            string line = "";
             foreach (var testCase in testCases)
             {
                 var iterationResults = new List<Tuple<double, double[]>>();
@@ -51,7 +51,6 @@ namespace tests
                 var sortedIterationResults = iterationResults.OrderBy(x => x.Item1).ToList();
                 var bestOfTen = sortedIterationResults.First();
 
-                string line = "";
                 line += $"{Name}; ";
                 line += $"{numberOfGenes}; ";
                 line += $"{testCase.blackWidowAlgorithmParameters.ProcreatingRate}; ";
@@ -78,12 +77,8 @@ namespace tests
                     tempFs.Add(iteration.Item1);
                 }
                 line += $"{MathExtension.StandardDeviation(tempFs)}";
-                Console.WriteLine(line);
             }
-
-
-
-            return true;
+            return line;
         }
     }
 }
