@@ -9,11 +9,11 @@ namespace tests
         public HimmelblauFunctionTest(List<TestCase> testCases_t)
         {
             FunctionDomain domain = new FunctionDomain(-5d, 5d);
-            Name="HimmelblauFunctionTest";
+            Name="Himmelblau Function";
             numberOfGenes=2;
             fitnessFunction=new HimmelblausFunction(domain);
             testCases = testCases_t;
         }
 
     }
-}
+} 

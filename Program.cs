@@ -1,6 +1,7 @@
 ﻿using BlackWidowOptimizationAlgorithm.OptimalizationAlgorithms.BlackWidow;
 using tests;
 using System.Collections.Generic;
+using BlackWidowOptimizationAlgorithm.tests;
 
 List<TestCase> generateTestCases(List<int> populationSizes, List<int> maxIterations)
 {
@@ -27,14 +28,15 @@ List<TestCase> generateTestCases(List<int> populationSizes, List<int> maxIterati
 }
 
 var populationSizes = new List<int> { 10, 20, 40, 80 };
-var maxIterations = new List<int> { 5, 10, 20, 40, 60, 80 };
+var maxIterations = new List<int> { 10, 20, 40, 60, 80 };
 
 var testCases = generateTestCases(populationSizes, maxIterations);
 
-var testFunction = new HimmelblauFunctionTest(testCases);
+//var testFunction = new HimmelblauFunctionTest(testCases);
+//testFunction.TestsToCsv();
 
-using (StreamWriter writer = new StreamWriter("/result.csv"))
-{
-    var result = testFunction.TestsToCsv();
-    writer.WriteLine(result);
-}
+var testFunction = new RastriginFuncionTest(testCases);
+testFunction.TestsToCsv();
+
+//var testFunction = new HimmelblauFunctionTest(testCases);
+//testFunction.TestsToCsv();

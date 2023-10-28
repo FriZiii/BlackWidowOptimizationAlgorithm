@@ -34,10 +34,10 @@ namespace tests
             return true;
         }
 
-        public string TestsToCsv()
+        public void TestsToCsv()
         {
+            string exel = "";
             Console.WriteLine($"Funkcja testowa; Liczba szukanych parametrów; Współczynnik prokreacji; Współczynnik mutacji; Współczynnik kanibalizmu; Maksymalna liczba iteracji; Rozmiar populacji; Znalezione najlepsze minimum; Odchylenie standardowe poszukiwanych parametrów; Najlepsza znaleziona wartość funkcji celu; Odchylenie standardowe funkcji celu");
-            string line = "";
             foreach (var testCase in testCases)
             {
                 var iterationResults = new List<Tuple<double, double[]>>();
@@ -46,11 +46,13 @@ namespace tests
                     var BWOA = new BlackWidowAlgorithm(testCase.blackWidowAlgorithmParameters, fitnessFunction, testCase.populationSize, numberOfGenes);
 
                     var result = BWOA.Solve();
+                    BWOA.XBest = BWOA.XBest.Select(x => Math.Round(x, 8)).ToArray();
                     iterationResults.Add(new Tuple<double, double[]>(BWOA.FBest, BWOA.XBest));
                 }
                 var sortedIterationResults = iterationResults.OrderBy(x => x.Item1).ToList();
                 var bestOfTen = sortedIterationResults.First();
 
+                string line = "";
                 line += $"{Name}; ";
                 line += $"{numberOfGenes}; ";
                 line += $"{testCase.blackWidowAlgorithmParameters.ProcreatingRate}; ";
@@ -67,7 +69,7 @@ namespace tests
                     {
                         tempXs.Add(iteration.Item2[i]);
                     }
-                    deviantionOfXs.Add(MathExtension.StandardDeviation(tempXs));
+                    deviantionOfXs.Add(Math.Round(MathExtension.StandardDeviation(tempXs), 5));
                 }
                 line += $"({string.Join(", ", deviantionOfXs)}); ";
                 line += $"{bestOfTen.Item1}; ";
@@ -76,9 +78,17 @@ namespace tests
                 {
                     tempFs.Add(iteration.Item1);
                 }
-                line += $"{MathExtension.StandardDeviation(tempFs)}";
+                line += $"{Math.Round(MathExtension.StandardDeviation(tempFs), 5)} \n";
+                Console.WriteLine(line);
+                exel += line;
             }
-            return line;
+
+
+            using (StreamWriter writer = new StreamWriter("D:\\Pliki\\c#\\BlackWidowOptimizationAlgorithm\\Wyniki\\RastriginFunction30genesM05.csv"))
+            {
+                writer.WriteLine(exel);
+            }
+
         }
     }
 }
